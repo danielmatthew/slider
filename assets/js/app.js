@@ -13,8 +13,8 @@ $(document).ready(function(){
 
   	init: function(){
   		// Manually scroll
-  		this.el.on('scroll', function(event) {
-  			slider.moveSlidePosition(event);
+  		this.el.slider.on('scroll', function(e) {
+  			slider.moveSlidePosition(e);
   		});
   		// Or click button
   		this.el.sliderNav.on('click', 'a', function(e){
@@ -22,13 +22,13 @@ $(document).ready(function(){
   		});
   	},
 
-  	moveSlidePosition: function(){
+  	moveSlidePosition: function(e){
   		this.el.allSlides.css({
-  			'background-position': $(event.target).scrollLeft()/6-100 + 'px 0'
+  			'background-position': $(e.target).scrollLeft()/6-100 + 'px 0'
   		});
   	},
 
-  	handleNavClick: function(){
+  	handleNavClick: function(e, el){
   		e.preventDefault();
 
   		var position = $(el).attr('href').split('-').pop();
