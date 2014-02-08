@@ -27,16 +27,16 @@ $(document).ready(function(){
       },
 
       bindUIEvents: function(){
-        this.el.holder.on('touchstart', function(e){
-          slider.start(e);
+        this.el.holder.on('touchstart', function(event){
+          slider.start(event);
         });
 
-        this.el.holder.on('touchmove', function(e){
-          slider.move(e);
+        this.el.holder.on('touchmove', function(event){
+          slider.move(event);
         });
 
-        this.el.holder.on('touchend', function(e){
-          slider.end(e);
+        this.el.holder.on('touchend', function(event){
+          slider.end(event);
         });
       },
 
@@ -79,10 +79,8 @@ $(document).ready(function(){
         this.el.holder.addClass('animate').css('transform', 'translate3d(-' + this.slideWidth + 'px, 0, 0)');
         this.el.imgSlide.addClass('animate').css('transform', 'translate3d(-' + 100 - this.index*50 + 'px, 0, 0)');
       }
+    };
 
-
-
-
-    }
+    slider.init();
   }
 });
