@@ -1,53 +1,88 @@
 $(document).ready(function(){
-  
-  var slider = {
-  	el: {
-  		slider: $('#slider'),
-  		allSlides: $('.slide'),
-  		sliderNav: $('.slider-nav'),
-  		allNavButtons: $('.slider-nav > a')
-  	},
 
-  	timing: 800,
-  	slideWidth: 300, // Could measure this - for fluid-based carousel? YES
+  if (navigator.msMaxTouchPoints) {
+    $('#slider').addClass('ms-touch');
 
-  	init: function(){
-  		// Manually scroll
-  		this.el.slider.on('scroll', function(e) {
-  			slider.moveSlidePosition(e);
-  		});
-  		// Or click button
-  		this.el.sliderNav.on('click', 'a', function(e){
-  			slider.handleNavClick(e, this);
-  		});
-  	},
+    $('#slider').on('scroll', function(){
+      $('.slide-image').css('transform', 'translate3d(-' + (100-$(this).scrollLeft()/6)+ 'px, 0, 0)');
+    })
+  } else {
+    var slider = {
+      el: {
+        slider: $('#slider'),
+        holder: $('.holder'),
+        imgSlide: $('.slide-image')
+      },
 
-  	moveSlidePosition: function(e){
-  		this.el.allSlides.css({
-  			'background-position': $(e.target).scrollLeft()/6-100 + 'px 0'
-  		});
-  	},
+      // Makes slider work
+      slideWidth: $('#slider').width(),
+      touchstartx: undefined,
+      touchmovex: undefined,
+      movex: undefined,
+      index: 0,
+      longTouch: undefined,
 
-  	handleNavClick: function(e, el){
-  		e.preventDefault();
+      init: function() {
+        this.bindUIEvents();
+      },
 
-  		var position = $(el).attr('href').split('-').pop();
+      bindUIEvents: function(){
+        this.el.holder.on('touchstart', function(e){
+          slider.start(e);
+        });
 
-  		this.el.slider.animate({
-  			scrollLeft: position * this.slideWidth
-  		}, this.timing);
+        this.el.holder.on('touchmove', function(e){
+          slider.move(e);
+        });
 
-  		this.changeActiveNav(el);
-  	},
+        this.el.holder.on('touchend', function(e){
+          slider.end(e);
+        });
+      },
 
-  	changeActiveNav: function(el) {
-  		// Remove active from all links
-  		this.el.allNavButtons.removeClass('active');
+      start: function(event){
+         this.longTouch = false;
+         setTimeout(function(){
+           window.slider.longTouch = true;
+         }, 250);
+         
+         this.touchstartx = event.originalEvent.touches[0].pageX;
 
-  		// Add to new active link
-  		$(el).addClass('active');
-  	}
-  };
+         $('.animate').removeClass('animate');       
+      },
 
-  slider.init();
+      move: function(event){
+        this.touchmovex = event.originalEvent.touches[0].pageX;
+        this.movex = this.index * this.slideWidth + (this.touchstartx - this.touchmovex);
+        var panx = 100 - this.movex/6;
+
+        if (this.movex < 600) {
+          this.el.holder.css('transform', 'translate3d(-' + this.movex + 'px, 0, 0)');
+        }
+
+        if (panx < 100) {
+          this.el.imgSlide.css('transform', 'translate3d(-' + panx + 'px, 0, 0)');
+        }
+      },
+
+      end: function(event){
+        var absMove = Math.abs(this.index * this.slideWidth - this.movex);
+
+        if (absMove > this.slideWidth/2 || this.longTouch === false) {
+          if (this.movex > this.index * this.slideWidth && this.index < 2) {
+            this.index++;
+          } else if (this.movex < this.index * this.slideWidth && this.index > 0) {
+            this.index--;
+          }
+        }
+
+        this.el.holder.addClass('animate').css('transform', 'translate3d(-' + this.slideWidth + 'px, 0, 0)');
+        this.el.imgSlide.addClass('animate').css('transform', 'translate3d(-' + 100 - this.index*50 + 'px, 0, 0)');
+      }
+
+
+
+
+    }
+  }
 });
